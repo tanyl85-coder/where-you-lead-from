@@ -1552,7 +1552,12 @@ function stopRoomWatch(){ if(roomTimer){ clearInterval(roomTimer); roomTimer=nul
    so a facilitator can still debrief from it. */
 const ROOM_DAYS=7;
 function roomStatus(data){
-  if(!data || !data.opened_at) return '';
+  // No 'expired' field at all means the database has not run the expiry
+  // migration yet. Say nothing rather than imply a protection that is absent.
+  if(!data || !('expired' in data)) return '';
+  // A room with no results yet has no opening time, so it has no countdown.
+  // Still confirm it is open, or an empty room looks like an unmigrated one.
+  if(!data.opened_at) return `<span style="color:#2e7d52">● Open · closes ${ROOM_DAYS} days after the first result</span>`;
   const opened=new Date(data.opened_at);
   const closes=new Date(opened.getTime()+ROOM_DAYS*864e5);
   if(data.expired) return `<span style="color:var(--war)">● Closed to new results since ${closes.toLocaleDateString()}</span>`;
