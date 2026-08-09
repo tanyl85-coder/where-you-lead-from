@@ -15,7 +15,7 @@ Both are facilitated reflection exercises — not validated psychometric instrum
 
 **Energy Duels** does the same by default. If you enter a **workshop code** on the welcome screen, one anonymous record is sent to that room's group report: your four energy scores, the tie-break winner if you had one, and your pressure tendency if you answered. Nothing else leaves your device — no name, no email, no individual duel choices, and not the commitment you write on the last screen. Leave the code box blank and nothing is sent at all.
 
-The group report is aggregate only. It never shows names or individual results, and the database refuses to return anything until 5 people have finished under that code.
+The group report is aggregate only. It never shows names or individual results, and the database refuses to return anything until 5 people have finished under that code. A room stops accepting new results 7 days after its first one, so a workshop code that leaks later cannot be used to add anything.
 
 ## For facilitators
 

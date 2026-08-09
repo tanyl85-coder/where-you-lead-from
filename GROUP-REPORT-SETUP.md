@@ -96,8 +96,13 @@ anonymous row per participant for a post-workshop pack.
 
 ## Notes and limits
 
+- **Rooms close after 7 days.** A room stops accepting new results 7 days after its *first*
+  result arrives, so a code that leaks after the session cannot be used to inject anything.
+  The report stays readable, so you can still debrief from it later. The room view shows
+  "Open, closes in N days" or "Closed to new results". A replayed result does not extend the
+  clock.
 - **Codes are guessable in principle.** Six characters from a 31-character alphabet is about
-  a billion combinations, so casual guessing will not find a live room. But the data behind
+  887 million combinations, so casual guessing will not find a live room. But the data behind
   a code is four anonymous numbers, so the consequence of a guess is small. Generate a fresh
   code per session rather than reusing one.
 - **A player can join only one workshop per game.** Changing the code on the welcome screen

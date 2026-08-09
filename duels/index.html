@@ -1485,7 +1485,7 @@ function buildRoom(rows, meta={}){
     <div class="report-head">
       <h2 class="screen-title" style="font-size:22px;margin:0">Energy in the room</h2>
       <div class="note" style="text-align:right">
-        <b style="color:var(--gold-deep)">${rows.length} participants</b>${meta.code?` · code ${meta.code}`:''}<br>${new Date().toLocaleString()}
+        <b style="color:var(--gold-deep)">${rows.length} participants</b>${meta.code?` · code ${meta.code}`:''}${meta.expired?' · closed':''}<br>${new Date().toLocaleString()}
       </div>
     </div>
 
@@ -1548,20 +1548,36 @@ let roomTimer=null, roomWatching='';
 
 function stopRoomWatch(){ if(roomTimer){ clearInterval(roomTimer); roomTimer=null; } roomWatching=''; }
 
+/* A room closes to new results 7 days after its first one. Reading stays open
+   so a facilitator can still debrief from it. */
+const ROOM_DAYS=7;
+function roomStatus(data){
+  if(!data || !data.opened_at) return '';
+  const opened=new Date(data.opened_at);
+  const closes=new Date(opened.getTime()+ROOM_DAYS*864e5);
+  if(data.expired) return `<span style="color:var(--war)">● Closed to new results since ${closes.toLocaleDateString()}</span>`;
+  const left=Math.max(0,Math.ceil((closes-Date.now())/864e5));
+  return `<span style="color:#2e7d52">● Open · closes in ${left} day${left===1?'':'s'}</span>`;
+}
+
 async function loadRoom(code, quiet){
   try{
     const data=await fetchRoom(code);
     const n=data && typeof data.n==='number' ? data.n : 0;
     $('#liveBar').style.display='flex';
     $('#liveCount').textContent=n;
-    $('#liveStamp').textContent='updated '+new Date().toLocaleTimeString();
+    $('#liveStamp').innerHTML=(roomStatus(data)?roomStatus(data)+' &ensp;·&ensp; ':'')+'updated '+new Date().toLocaleTimeString();
+    if(data && data.expired) stopRoomWatch();   // nothing more will arrive
     if(!data || data.locked){
-      $('#roomOut').innerHTML=`<div class="lock-note">🔒&ensp;Group report unlocks at <b>5 or more participants</b> to protect anonymity.<br>Currently: ${n} ${n===1?'result':'results'} under code <b>${code}</b>.<br><span style="font-size:13px">This page refreshes on its own as people finish.</span></div>`;
+      $('#roomOut').innerHTML=`<div class="lock-note">🔒&ensp;Group report unlocks at <b>5 or more participants</b> to protect anonymity.<br>Currently: ${n} ${n===1?'result':'results'} under code <b>${code}</b>.${
+        data && data.expired
+          ? '<br><span style="font-size:13px">This room has closed, so it will not reach 5. Start a new code for your next session.</span>'
+          : '<br><span style="font-size:13px">This page refreshes on its own as people finish.</span>'}</div>`;
       $('#btnRoomPrint').style.display=$('#btnRoomCsv').style.display='none';
       lastReport=null;
       return;
     }
-    buildRoom(data.rows||[], {code, quiet});
+    buildRoom(data.rows||[], {code, quiet, expired:data.expired, openedAt:data.opened_at});
   }catch(err){
     if(!quiet){
       toast('Could not reach the group report');
@@ -1597,8 +1613,14 @@ async function submitToRoom(){
     if(btn) btn.style.display='none';
   }catch(err){
     el.className='ws-state bad';
-    el.textContent='Could not reach the group report. Your result is safe on this device.';
-    if(btn) btn.style.display='inline-flex';
+    if(/workshop closed/i.test(err.message||'')){
+      // Room expired: retrying will never help, so do not offer it.
+      el.textContent=`Workshop ${code} has closed to new results. Share the code below with your facilitator instead.`;
+      if(btn) btn.style.display='none';
+    }else{
+      el.textContent='Could not reach the group report. Your result is safe on this device.';
+      if(btn) btn.style.display='inline-flex';
+    }
   }
 }
 
