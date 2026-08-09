@@ -285,7 +285,73 @@
   .share-chip:hover{border-color:var(--gold)}
   .share-chip .cp{font-family:var(--disp);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
 
+  /* ---------- workshop code ---------- */
+  .ws-join{
+    background:var(--card);border:3px solid var(--line2);border-radius:18px;
+    padding:18px 20px;margin:22px 0 6px;
+  }
+  .ws-join .ws-h{font-family:var(--disp);font-weight:800;font-size:15px;margin-bottom:4px}
+  .ws-join .ws-sub{font-size:13.5px;color:var(--ink-dim);font-weight:600;line-height:1.6}
+  .ws-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  input.ws-code{
+    flex:1 1 190px;min-width:0;background:var(--bg);border:3px solid var(--line2);border-radius:14px;
+    color:var(--gold-deep);font-family:'Cascadia Code',Consolas,monospace;font-size:19px;font-weight:700;
+    letter-spacing:.22em;text-transform:uppercase;padding:12px 16px;outline:none;
+  }
+  input.ws-code:focus{border-color:var(--gold)}
+  input.ws-code::placeholder{color:var(--ink-faint);letter-spacing:.16em}
+  .ws-state{margin-top:12px;font-size:13.5px;font-weight:700;display:none}
+  .ws-state.ok{display:block;color:#2e7d52}
+  .ws-state.bad{display:block;color:var(--war)}
+  .code-hero{
+    display:inline-block;background:var(--card);border:4px dashed var(--gold);border-radius:20px;
+    padding:18px 30px;margin:6px 0 4px;cursor:pointer;
+  }
+  .code-hero .cval{
+    font-family:'Cascadia Code',Consolas,monospace;font-size:clamp(30px,7vw,44px);font-weight:800;
+    letter-spacing:.16em;color:var(--gold-deep);line-height:1.1;
+  }
+  .code-hero .clab{font-family:var(--disp);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:800}
+  .join-url{
+    font-family:Consolas,monospace;font-size:13px;color:var(--ink-dim);word-break:break-all;
+    background:var(--bg);border:2px solid var(--line2);border-radius:12px;padding:10px 14px;margin-top:12px;cursor:pointer;
+  }
+
   /* ---------- room ---------- */
+  .room-mode{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 4px}
+  .room-mode button{
+    background:var(--card);border:3px solid var(--line2);border-radius:14px;padding:10px 18px;
+    font-family:var(--disp);font-weight:800;font-size:13.5px;color:var(--ink-dim);cursor:pointer;
+  }
+  .room-mode button.on{border-color:var(--gold);color:var(--gold-deep);background:var(--gold-soft,var(--card))}
+  .room-panel{display:none}
+  .room-panel.on{display:block}
+  .live-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    background:var(--card);border:3px solid var(--line2);border-radius:16px;padding:12px 18px;margin:20px 0 4px;
+  }
+  .live-bar .lb-n{font-family:var(--disp);font-weight:800;font-size:14px}
+  .live-dot{width:9px;height:9px;border-radius:50%;background:#2e7d52;display:inline-block;margin-right:7px;animation:pulseDot 1.8s infinite}
+  @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.25}}
+  .pr-row{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+  .pr-row .pl{width:210px;font-size:13px;color:var(--ink-dim);text-align:right;flex:none;font-weight:700;line-height:1.35}
+  .report-head{
+    display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;
+    border-bottom:3px solid var(--line2);padding-bottom:12px;margin-bottom:6px;
+  }
+  .insight{
+    background:var(--card);border:3px solid var(--line2);border-left-width:9px;border-radius:16px;
+    padding:16px 20px;margin:20px 0;font-size:14.5px;line-height:1.7;font-weight:600;color:var(--ink-dim);
+  }
+  .insight b{color:var(--ink)}
+  @media print{
+    body{background:#fff !important}
+    body::before,#confetti,.no-print{display:none !important}
+    .screen{display:none !important}
+    .screen.active{display:block !important}
+    .room-tile,.insight,.live-bar{break-inside:avoid}
+    .wrap{max-width:none;padding:0}
+  }
   textarea.codes{
     width:100%;min-height:110px;background:var(--card);border:3px solid var(--line2);border-radius:16px;
     color:var(--ink);font-family:Consolas,monospace;font-size:13px;padding:14px;outline:none;resize:vertical;
@@ -344,9 +410,18 @@
       <div class="hp"><span class="n" style="background:var(--lov)">3</span><span><b>Meet your energy.</b> At the end you'll meet the character you lead from — plus the energy you may need to call on more deliberately.</span></div>
     </div>
 
+    <div class="ws-join" id="wsJoin">
+      <div class="ws-h">🎟️ Playing in a workshop?</div>
+      <div class="ws-sub">Enter the code your facilitator put on screen. Your four energy scores and your pressure answer are sent to the group report anonymously — no name, no individual duel choices, nothing that points back to you. The report only ever opens once 5 people have finished. Leave the box blank to play on your own and send nothing.</div>
+      <div class="ws-row">
+        <input class="ws-code" id="wsCode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. K7M2QP" aria-label="Workshop code">
+      </div>
+      <div class="ws-state" id="wsState"></div>
+    </div>
+
     <label class="ack" for="ackBox">
       <input type="checkbox" id="ackBox">
-      <span class="at"><b>I understand.</b> This is a reflection game, not a personality test or assessment. It identifies the leadership energy I reach for first — results are for my own reflection and workshop discussion only.</span>
+      <span class="at"><b>I understand.</b> This is a reflection game, not a personality test or assessment. It identifies the leadership energy I reach for first — results are for my own reflection and workshop discussion only. If I enter a workshop code above, my four scores and pressure answer are added anonymously to that room's group report.</span>
     </label>
 
     <button class="btn big" id="btnStart" disabled>⚔&ensp;Enter the Arena</button>
@@ -465,7 +540,9 @@
         <button class="btn ghost" id="btnRestart">Play again</button>
       </div>
       <div style="margin-top:28px">
-        <div class="note" style="text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:10px">Optional — share anonymously with the room</div>
+        <div class="note" style="text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:10px" id="shareLabel">Optional — share anonymously with the room</div>
+        <div id="sendState" class="ws-state" style="margin-bottom:12px"></div>
+        <button class="btn ghost" id="btnRetrySend" style="display:none;margin-bottom:14px">↻&ensp;Try sending again</button>
         <div class="share-chip" onclick="copyCode()" title="Click to copy"><span id="codeText"></span><span class="cp">Copy</span></div>
         <p class="note" style="margin-top:10px">The code carries your four scores only — no name, no answers.</p>
       </div>
@@ -476,15 +553,56 @@
   <section id="scr-room" class="screen">
     <span class="kicker">Facilitator · Room view</span>
     <h1 class="display" style="font-size:clamp(28px,5vw,40px)">The energy in the <span class="rainbow">room</span></h1>
-    <p class="lede">Paste anonymous result codes (one per line, e.g. <span style="font-family:monospace;color:var(--gold-deep)">DUEL#4.3.2.3</span>). The aggregate unlocks at <b>5+ participants</b> and never shows names or individual results.</p>
-    <div style="margin:20px 0 14px"><textarea class="codes" id="codesInput" placeholder="DUEL#4.3.2.3&#10;DUEL#6.2.2.2&#10;…"></textarea></div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap">
-      <button class="btn" id="btnRoomBuild">Build room view</button>
-      <button class="btn ghost" id="btnRoomLocal">Add results from this device</button>
+    <p class="lede">Give the room one workshop code. Every result that comes in under that code is consolidated here. The report unlocks at <b>5+ participants</b> and never shows names or individual results.</p>
+
+    <div class="room-mode no-print">
+      <button id="mdWorkshop" class="on">🎟️ Workshop code</button>
+      <button id="mdPaste">📋 Paste codes</button>
     </div>
+
+    <!-- ---- mode A: workshop code ---- -->
+    <div class="room-panel on" id="pnWorkshop">
+      <div class="no-print">
+        <div class="ws-row" style="margin-top:18px">
+          <input class="ws-code" id="roomCodeInput" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="K7M2QP" aria-label="Workshop code">
+          <button class="btn" id="btnRoomOpen">Open report</button>
+          <button class="btn ghost" id="btnRoomNew">＋&ensp;New code</button>
+        </div>
+        <div id="roomShare" style="display:none;text-align:center;margin:22px 0 4px">
+          <div class="code-hero" onclick="copyText(document.getElementById('shareCode').textContent,'Workshop code copied')" title="Click to copy">
+            <div class="clab">Workshop code</div>
+            <div class="cval" id="shareCode"></div>
+          </div>
+          <p class="note" style="margin-top:8px">Put this on screen. Players type it on the welcome page before they start.</p>
+          <div class="join-url" id="joinUrl" onclick="copyText(this.textContent,'Join link copied')" title="Click to copy"></div>
+        </div>
+      </div>
+      <div id="liveBar" class="live-bar no-print" style="display:none">
+        <div class="lb-n"><span class="live-dot"></span><span id="liveCount">0</span> results in</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <span class="note" id="liveStamp"></span>
+          <button class="btn ghost" id="btnRoomRefresh" style="padding:8px 16px;font-size:12px">↻&ensp;Refresh</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- mode B: paste codes (offline fallback) ---- -->
+    <div class="room-panel" id="pnPaste">
+      <p class="note" style="margin:16px 0 10px;line-height:1.7">No internet, or collecting codes by hand? Paste anonymous result codes, one per line, e.g. <span style="font-family:monospace;color:var(--gold-deep)">DUEL#4.3.2.3</span>.</p>
+      <div style="margin:0 0 14px"><textarea class="codes" id="codesInput" placeholder="DUEL#4.3.2.3&#10;DUEL#6.2.2.2&#10;…"></textarea></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn" id="btnRoomBuild">Build room view</button>
+        <button class="btn ghost" id="btnRoomLocal">Add results from this device</button>
+      </div>
+    </div>
+
     <div id="roomOut"></div>
-    <div class="rule"></div>
-    <button class="btn ghost" id="btnRoomBack">← Back to start</button>
+    <div class="rule no-print"></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap" class="no-print">
+      <button class="btn ghost" id="btnRoomBack">← Back to start</button>
+      <button class="btn ghost" id="btnRoomPrint" style="display:none">🖨&ensp;Print / PDF</button>
+      <button class="btn ghost" id="btnRoomCsv" style="display:none">↓&ensp;CSV</button>
+    </div>
   </section>
 
 </div>
@@ -642,8 +760,97 @@ const RANGE_SCENARIOS = [
 /* ================================================================
    STATE
 ================================================================ */
+/* ================================================================
+   GROUP REPORT BACKEND  —  ⚙ CONFIGURE THESE TWO LINES
+   ----------------------------------------------------------------
+   Paste your Supabase project URL and anon (public) key below.
+   Leave them empty and the game still works perfectly — it simply
+   falls back to the facilitator pasting result codes by hand.
+   Setup instructions: GROUP-REPORT-SETUP.md
+================================================================ */
+const SUPABASE_URL      = 'https://zrjjjwfbmguyajmosenh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpyampqd2ZibWd1eWFqbW9zZW5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNDE0MjAsImV4cCI6MjEwMTgxNzQyMH0.sAjprhnJhdW1vWnX5Hbl1xs4qKx23G8Ah_R9QXEUa2w';
+
+const cloudOn = () => !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+
 const LS_KEY='energyDuels.v1', ROOM_KEY='energyDuels.room.v1';
+const WS_KEY='energyDuels.workshop.v1', CID_KEY='energyDuels.client.v1';
+const CODE_ALPHABET='ABCDEFGHJKMNPQRSTUVWXYZ23456789';   // no I, L, O, 0, 1
 let state=null, duelIdx=0, inTiebreak=false;
+
+/* ---------- workshop code helpers ---------- */
+function normCode(s){
+  return String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+}
+function validCode(s){
+  const c=normCode(s);
+  return c.length===6 && [...c].every(ch=>CODE_ALPHABET.includes(ch)) ? c : '';
+}
+function makeCode(){
+  const a=new Uint32Array(6);
+  (crypto.getRandomValues ? crypto : {getRandomValues:x=>{for(let i=0;i<x.length;i++)x[i]=Math.random()*4294967296;}})
+    .getRandomValues(a);
+  return [...a].map(n=>CODE_ALPHABET[n%CODE_ALPHABET.length]).join('');
+}
+function clientId(){
+  let id=null;
+  try{ id=localStorage.getItem(CID_KEY); }catch(e){}
+  if(!id){
+    id = (crypto.randomUUID ? crypto.randomUUID()
+         : 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,10));
+    try{ localStorage.setItem(CID_KEY,id); }catch(e){}
+  }
+  return id;
+}
+function getWorkshop(){ try{ return localStorage.getItem(WS_KEY)||''; }catch(e){ return ''; } }
+function setWorkshop(c){
+  try{ c ? localStorage.setItem(WS_KEY,c) : localStorage.removeItem(WS_KEY); }catch(e){}
+}
+function joinLink(code){
+  return location.origin + location.pathname + '?room=' + code;
+}
+
+/* ---------- supabase REST ---------- */
+async function supaFetch(path, opts={}){
+  const res = await fetch(SUPABASE_URL.replace(/\/$/,'') + path, {
+    ...opts,
+    headers:{
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      ...(opts.headers||{})
+    }
+  });
+  if(!res.ok) throw new Error('HTTP '+res.status+' '+(await res.text()).slice(0,180));
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+/* Send one anonymous result. Goes through a database function, so the
+   public key has no direct read or write access to the results table.
+   Upserts on (room_code, client_id): a replay from the same device
+   replaces its earlier result rather than double-counting it. */
+async function sendResult(code, w, tb, pressure){
+  return supaFetch('/rest/v1/rpc/duel_submit', {
+    method:'POST',
+    body: JSON.stringify({
+      p_code: code,
+      p_client: clientId(),
+      p_sov:w.SOV, p_war:w.WAR, p_lov:w.LOV, p_jes:w.JES,
+      p_tiebreak: tb && tb.winner ? tb.winner : null,
+      p_pressure: pressure || null
+    })
+  });
+}
+
+/* Fetch the aggregate. The n>=5 gate is enforced inside the database
+   function, not here, so raw rows never leave the server early. */
+async function fetchRoom(code){
+  return supaFetch('/rest/v1/rpc/duel_room_report', {
+    method:'POST',
+    body: JSON.stringify({ p_code: code })
+  });
+}
 
 function freshState(){
   return {
@@ -655,7 +862,8 @@ function freshState(){
     tb:null,                                 // {pair, winner, flip}
     pressure:null,
     rangePlayed:[], rangeChoices:{},
-    chosen:null, actionText:'', finished:false
+    chosen:null, actionText:'', finished:false,
+    room:getWorkshop(), sent:false
   };
 }
 function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
@@ -862,7 +1070,7 @@ function beginReveal(){
 function renderReveal(){
   const w=computeWins();
   result=classify(w, state.tb);
-  if(!state.finished){ saveRoomResult(w); state.finished=true; save(); }
+  if(!state.finished){ saveRoomResult(w); state.finished=true; save(); submitToRoom(); }
   const r=result;
   const rate=k=>Math.round(w[k]/6*100);
 
@@ -1214,40 +1422,189 @@ function parseRoomCodes(text){
   });
   return out;
 }
-function buildRoom(rows){
-  const out=$('#roomOut');
-  if(!rows.length){ out.innerHTML=''; toast('No valid codes — expected DUEL#a.b.c.d totalling 12'); return; }
-  if(rows.length<5){
-    out.innerHTML=`<div class="lock-note">🔒&ensp;Room view unlocks at <b>5 or more participants</b> to protect anonymity.<br>Currently: ${rows.length} valid ${rows.length===1?'code':'codes'}.</div>`;
-    return;
-  }
+let lastReport=null;   // {rows, code} — backs the CSV and print exports
+
+function analyseRoom(rows){
   const counts={SOV:0,WAR:0,LOV:0,JES:0}; let balanced=0;
   rows.forEach(s=>{
-    const a=classify(s,null);
+    const a=classify(s, s.tb?{winner:s.tb}:null);
     if(a.mode==='balanced'){ balanced++; return; }
     a.top.forEach(k=>counts[k]++);
   });
   const avg={}; EKEYS.forEach(k=>avg[k]=rows.reduce((t,s)=>t+s[k],0)/rows.length);
+  const pressure={}; let pressureN=0;
+  rows.forEach(s=>{ if(s.pressure){ pressure[s.pressure]=(pressure[s.pressure]||0)+1; pressureN++; } });
+  return {counts, balanced, avg, pressure, pressureN};
+}
+
+/* The one energy the room reaches for least — the most useful thing a
+   facilitator can name out loud, so it gets its own callout. */
+function roomInsight(rows, a){
+  const lowest=EKEYS.slice().sort((x,y)=>a.avg[x]-a.avg[y])[0];
+  const highest=EKEYS.slice().sort((x,y)=>a.avg[y]-a.avg[x])[0];
+  const spread=Math.round((a.avg[highest]-a.avg[lowest])/6*100);
+  let line=`This room reaches most readily for <b>${ENERGIES[highest].name}</b> and least readily for <b>${ENERGIES[lowest].name}</b> — a spread of ${spread} percentage points. `;
+  line += spread<=15
+    ? 'That is a fairly even room. Ask what shifts the balance under pressure or in a particular role.'
+    : `Ask the room what would change if <b>${ENERGIES[lowest].name}</b> were the deliberate first move more often.`;
+  if(a.balanced) line += ` ${a.balanced} of ${rows.length} drew on a balanced range rather than a single lead.`;
+  return line;
+}
+
+function buildRoom(rows, meta={}){
+  const out=$('#roomOut');
+  $('#btnRoomPrint').style.display=$('#btnRoomCsv').style.display='none';
+  lastReport=null;
+  if(!rows.length){
+    out.innerHTML='';
+    toast(meta.code ? 'No results under that code yet' : 'No valid codes — expected DUEL#a.b.c.d totalling 12');
+    return;
+  }
+  if(rows.length<5){
+    out.innerHTML=`<div class="lock-note">🔒&ensp;Group report unlocks at <b>5 or more participants</b> to protect anonymity.<br>Currently: ${rows.length} ${rows.length===1?'result':'results'}.</div>`;
+    return;
+  }
+  const a=analyseRoom(rows);
+  lastReport={rows, code:meta.code||''};
+
+  const pressureBlock = a.pressureN ? `
+    <h2 class="screen-title" style="font-size:20px;margin-top:30px">Under sustained pressure</h2>
+    <p class="note" style="margin:-4px 0 16px">Each person's own watch-out, held separately from their energy scores. ${a.pressureN} of ${rows.length} answered.</p>
+    ${PRESSURE.map(p=>{
+      const n=a.pressure[p.id]||0;
+      const pc=Math.round(n/a.pressureN*100);
+      const col=p.key==='NONE'?'#9a9086':ENERGIES[p.key].color;
+      return `<div class="pr-row">
+        <div class="pl">${p.label}</div>
+        <div class="track"><div class="fill" style="width:${Math.max(9,pc)}%;background:${col}">${n}</div></div>
+      </div>`;
+    }).join('')}` : '';
+
   out.innerHTML=`
     <div class="rule"></div>
-    <h2 class="screen-title" style="font-size:22px">Lead energies in the room — ${rows.length} players${balanced?` · ${balanced} balanced-range`:''}</h2>
+    <div class="report-head">
+      <h2 class="screen-title" style="font-size:22px;margin:0">Energy in the room</h2>
+      <div class="note" style="text-align:right">
+        <b style="color:var(--gold-deep)">${rows.length} participants</b>${meta.code?` · code ${meta.code}`:''}<br>${new Date().toLocaleString()}
+      </div>
+    </div>
+
+    <h2 class="screen-title" style="font-size:20px;margin-top:22px">Lead energies${a.balanced?` — plus ${a.balanced} balanced-range`:''}</h2>
     <div class="room-grid">
       ${EKEYS.map(k=>`<div class="room-tile" style="border-top-color:${ENERGIES[k].color}">
         <img class="ava" src="${IMGS.ava[k]}" alt="">
-        <div class="count" style="color:${ENERGIES[k].color}">${counts[k]}</div>
+        <div class="count" style="color:${ENERGIES[k].color}">${a.counts[k]}</div>
         <div class="nm">${ENERGIES[k].name}</div>
       </div>`).join('')}
     </div>
+    <p class="note" style="margin:-8px 0 4px">Anyone with two closely paired lead energies is counted under both, so these can total more than ${rows.length}.${a.balanced?` A further ${a.balanced} drew on a balanced range and are counted under none.`:''}</p>
+
     <h2 class="screen-title" style="font-size:20px;margin-top:24px">Average access rate</h2>
     ${EKEYS.map(k=>{
-      const pc=Math.round(avg[k]/6*100);
+      const pc=Math.round(a.avg[k]/6*100);
       return `<div class="avg-row">
         <div class="al">${ENERGIES[k].name}</div>
         <div class="track"><div class="fill" style="width:${Math.max(10,pc)}%;background:${ENERGIES[k].color}">${pc}%</div></div>
       </div>`;
     }).join('')}
-    <p class="note" style="margin-top:18px">Use this to discuss the diversity of energy in the room — not to compare who is better. No names or individual results are shown.</p>`;
-  toast(`Room view built — ${rows.length} players 🎉`);
+
+    <div class="insight" style="border-left-color:var(--gold)">${roomInsight(rows,a)}</div>
+    ${pressureBlock}
+    <p class="note" style="margin-top:22px">Use this to discuss the diversity of energy in the room — not to compare who is better. No names or individual results are shown.</p>`;
+
+  $('#btnRoomPrint').style.display=$('#btnRoomCsv').style.display='inline-flex';
+  if(!meta.quiet) toast(`Group report built — ${rows.length} participants 🎉`);
+}
+
+/* ---------- exports ---------- */
+function reportCsv(){
+  if(!lastReport) return;
+  const {rows, code}=lastReport;
+  const head=['participant','workshop_code','sovereign','warrior','lover','jester',
+              'result_mode','lead_energies','less_accessed','tiebreak_winner','pressure_tendency'];
+  const lines=[head.join(',')];
+  rows.forEach((s,i)=>{
+    const a=classify(s, s.tb?{winner:s.tb}:null);
+    const p=PRESSURE.find(x=>x.id===s.pressure);
+    const cell=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
+    lines.push([
+      i+1, code, s.SOV, s.WAR, s.LOV, s.JES,
+      a.mode,
+      a.mode==='balanced'?'':a.top.map(k=>ENERGIES[k].name).join(' + '),
+      a.bottom.map(k=>ENERGIES[k].name).join(' + '),
+      s.tb?ENERGIES[s.tb].name:'',
+      p?p.label:''
+    ].map(cell).join(','));
+  });
+  const blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=`energy-duels-group-report${code?'-'+code:''}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('CSV downloaded');
+}
+
+/* ---------- live workshop report ---------- */
+let roomTimer=null, roomWatching='';
+
+function stopRoomWatch(){ if(roomTimer){ clearInterval(roomTimer); roomTimer=null; } roomWatching=''; }
+
+async function loadRoom(code, quiet){
+  try{
+    const data=await fetchRoom(code);
+    const n=data && typeof data.n==='number' ? data.n : 0;
+    $('#liveBar').style.display='flex';
+    $('#liveCount').textContent=n;
+    $('#liveStamp').textContent='updated '+new Date().toLocaleTimeString();
+    if(!data || data.locked){
+      $('#roomOut').innerHTML=`<div class="lock-note">🔒&ensp;Group report unlocks at <b>5 or more participants</b> to protect anonymity.<br>Currently: ${n} ${n===1?'result':'results'} under code <b>${code}</b>.<br><span style="font-size:13px">This page refreshes on its own as people finish.</span></div>`;
+      $('#btnRoomPrint').style.display=$('#btnRoomCsv').style.display='none';
+      lastReport=null;
+      return;
+    }
+    buildRoom(data.rows||[], {code, quiet});
+  }catch(err){
+    if(!quiet){
+      toast('Could not reach the group report');
+      $('#roomOut').innerHTML=`<div class="lock-note">Could not reach the group report.<br><span style="font-size:13px">${String(err.message||err)}</span><br><span style="font-size:13px">Check the connection, or switch to <b>Paste codes</b>.</span></div>`;
+    }
+  }
+}
+
+function watchRoom(code){
+  stopRoomWatch();
+  roomWatching=code;
+  loadRoom(code,false);
+  roomTimer=setInterval(()=>{ if(roomWatching===code) loadRoom(code,true); }, 12000);
+}
+
+/* ---------- player submission ---------- */
+async function submitToRoom(){
+  const code=state && state.room ? validCode(state.room) : '';
+  const el=$('#sendState'), btn=$('#btnRetrySend');
+  if(!el) return;
+  if(!code || !cloudOn()){
+    el.className='ws-state'; el.textContent='';
+    if(btn) btn.style.display='none';
+    return;
+  }
+  el.className='ws-state ok'; el.textContent='Sending to the group report…';
+  try{
+    await sendResult(code, computeWins(), state.tb, state.pressure);
+    state.sent=true; save();
+    el.className='ws-state ok';
+    el.textContent=`✓ Added anonymously to workshop ${code}`;
+    $('#shareLabel').textContent='Your result is in the group report';
+    if(btn) btn.style.display='none';
+  }catch(err){
+    el.className='ws-state bad';
+    el.textContent='Could not reach the group report. Your result is safe on this device.';
+    if(btn) btn.style.display='inline-flex';
+  }
+}
+
+function copyText(txt,msg){
+  navigator.clipboard.writeText(txt)
+    .then(()=>toast(msg||'Copied')).catch(()=>toast('Select and copy manually'));
 }
 
 /* ================================================================
@@ -1300,8 +1657,80 @@ $('#btnRestart').addEventListener('click',()=>{
   show('#scr-welcome');
 });
 
-$('#linkRoom').addEventListener('click',()=>show('#scr-room'));
-$('#btnRoomBack').addEventListener('click',()=>show('#scr-welcome'));
+/* ---------- player: join a workshop ---------- */
+function paintJoinState(){
+  const raw=$('#wsCode').value, el=$('#wsState');
+  if(!raw.trim()){ el.className='ws-state'; el.textContent=''; setWorkshop(''); return; }
+  const code=validCode(raw);
+  if(code){
+    setWorkshop(code);
+    el.className='ws-state ok';
+    el.textContent=cloudOn()
+      ? `✓ Joining workshop ${code}. Your result will be added anonymously when you finish.`
+      : `✓ Workshop ${code} noted. Share your result code with the facilitator at the end.`;
+  }else{
+    setWorkshop('');
+    el.className='ws-state bad';
+    el.textContent='That code does not look right — it is 6 letters and numbers.';
+  }
+}
+$('#wsCode').addEventListener('input',e=>{
+  const p=normCode(e.target.value);
+  if(e.target.value!==p) e.target.value=p;
+  paintJoinState();
+});
+$('#btnRetrySend').addEventListener('click',submitToRoom);
+
+/* ---------- facilitator: room view ---------- */
+$('#linkRoom').addEventListener('click',()=>{
+  show('#scr-room');
+  if(!cloudOn()) setRoomMode('paste');
+});
+$('#btnRoomBack').addEventListener('click',()=>{ stopRoomWatch(); show('#scr-welcome'); });
+
+function setRoomMode(m){
+  const ws=m==='workshop';
+  $('#mdWorkshop').classList.toggle('on',ws);
+  $('#mdPaste').classList.toggle('on',!ws);
+  $('#pnWorkshop').classList.toggle('on',ws);
+  $('#pnPaste').classList.toggle('on',!ws);
+  if(!ws) stopRoomWatch();
+  $('#roomOut').innerHTML='';
+  $('#btnRoomPrint').style.display=$('#btnRoomCsv').style.display='none';
+  lastReport=null;
+}
+$('#mdWorkshop').addEventListener('click',()=>{
+  if(!cloudOn()){ toast('No group-report backend configured yet'); return; }
+  setRoomMode('workshop');
+});
+$('#mdPaste').addEventListener('click',()=>setRoomMode('paste'));
+
+$('#roomCodeInput').addEventListener('input',e=>{
+  const p=normCode(e.target.value);
+  if(e.target.value!==p) e.target.value=p;
+});
+$('#btnRoomOpen').addEventListener('click',()=>{
+  const code=validCode($('#roomCodeInput').value);
+  if(!code){ toast('Enter the 6-character workshop code'); return; }
+  if(!cloudOn()){ toast('No group-report backend configured yet'); return; }
+  $('#shareCode').textContent=code;
+  $('#joinUrl').textContent=joinLink(code);
+  $('#roomShare').style.display='block';
+  watchRoom(code);
+});
+$('#btnRoomNew').addEventListener('click',()=>{
+  const code=makeCode();
+  $('#roomCodeInput').value=code;
+  $('#shareCode').textContent=code;
+  $('#joinUrl').textContent=joinLink(code);
+  $('#roomShare').style.display='block';
+  if(cloudOn()) watchRoom(code);
+  else toast('Code created — configure the backend to collect results automatically');
+});
+$('#btnRoomRefresh').addEventListener('click',()=>{ if(roomWatching) loadRoom(roomWatching,false); });
+$('#btnRoomPrint').addEventListener('click',()=>window.print());
+$('#btnRoomCsv').addEventListener('click',reportCsv);
+
 $('#btnRoomBuild').addEventListener('click',()=>buildRoom(parseRoomCodes($('#codesInput').value)));
 $('#btnRoomLocal').addEventListener('click',()=>{
   let local=[];
@@ -1315,6 +1744,15 @@ $('#btnRoomLocal').addEventListener('click',()=>{
 
 /* ---------- resume ---------- */
 (function init(){
+  /* ?room=XXXXXX lets a facilitator share one link instead of dictating a code */
+  const urlCode=validCode(new URLSearchParams(location.search).get('room')||'');
+  const startCode=urlCode || getWorkshop();
+  if(startCode){ $('#wsCode').value=startCode; paintJoinState(); }
+  if(!cloudOn()){
+    $('#wsJoin').querySelector('.ws-sub').textContent=
+      'Enter the code your facilitator put on screen, then share your result code with them at the end. Leave it blank to play on your own.';
+  }
+
   const saved=load();
   if(saved && saved.v===1 && !saved.finished && saved.lastDone>=0){
     state=saved;
