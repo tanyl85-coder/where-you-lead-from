@@ -64,7 +64,11 @@ Pages picks it up in a minute or so.
 
 **Before the room arrives**
 
-1. Open the game, click *Facilitating? Open the room view*.
+1. Open the room view. It is **hidden from players** — there is no link to it anywhere in
+   the game. Add `#facilitator` to the end of the game URL, e.g.
+   `https://…/energy-duels-game.html#facilitator`, then enter the facilitator passphrase
+   (`ideal` by default). Your device remembers it after the first time.
+   To change the passphrase, edit `FACILITATOR_KEY` near the top of the game's script.
 2. Click **＋ New code**. A six-character code appears, along with a join link.
 3. Put the code on your slide. Participants type it on the welcome screen. If you would
    rather share a link or QR, use the join link — it fills the code in automatically.

@@ -94,8 +94,6 @@
     background:linear-gradient(135deg,var(--sov-soft),var(--lov-soft));
     border:2px solid var(--gold-soft);border-radius:18px;padding:16px 20px;margin-bottom:24px;
   }
-  .room-link{margin-top:24px;font-size:14px;color:var(--ink-faint);font-weight:600}
-  .room-link a{color:var(--jes);cursor:pointer;text-decoration:underline}
   .howplay{display:grid;gap:12px;margin:20px 0}
   .howplay .hp{display:flex;gap:14px;align-items:flex-start;font-size:15px;color:var(--ink-dim);line-height:1.55;font-weight:600}
   .howplay .n{
@@ -425,7 +423,6 @@
     </label>
 
     <button class="btn big" id="btnStart" disabled>⚔&ensp;Enter the Arena</button>
-    <p class="room-link">Facilitating? <a id="linkRoom">Open the room view</a></p>
   </section>
 
   <!-- ================= PRACTICE DUEL ================= -->
@@ -546,6 +543,22 @@
         <div class="share-chip" onclick="copyCode()" title="Click to copy"><span id="codeText"></span><span class="cp">Copy</span></div>
         <p class="note" style="margin-top:10px">The code carries your four scores only — no name, no answers.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- ================= FACILITATOR GATE ================= -->
+  <section id="scr-gate" class="screen">
+    <span class="kicker plain">🔒 Facilitator access</span>
+    <h1 class="display" style="font-size:clamp(28px,5vw,40px)">Room view is <span class="rainbow">locked</span></h1>
+    <p class="lede">This area shows the group report for a workshop. Enter the facilitator passphrase to continue.</p>
+    <div class="ws-row" style="margin-top:22px">
+      <input class="ws-code" id="gateKey" type="password" maxlength="40" autocomplete="off" spellcheck="false"
+             placeholder="Passphrase" aria-label="Facilitator passphrase" style="letter-spacing:.08em">
+    </div>
+    <div class="ws-state" id="gateState"></div>
+    <div class="duel-nav">
+      <button class="btn ghost" id="btnGateBack">← Back to the game</button>
+      <button class="btn" id="btnGateOpen">Unlock room view</button>
     </div>
   </section>
 
@@ -772,6 +785,19 @@ const SUPABASE_URL      = 'https://zrjjjwfbmguyajmosenh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpyampqd2ZibWd1eWFqbW9zZW5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNDE0MjAsImV4cCI6MjEwMTgxNzQyMH0.sAjprhnJhdW1vWnX5Hbl1xs4qKx23G8Ah_R9QXEUa2w';
 
 const cloudOn = () => !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+/* ================================================================
+   FACILITATOR ACCESS  —  ⚙ CHANGE THIS PASSPHRASE
+   ----------------------------------------------------------------
+   The room view is hidden from players: there is no link to it
+   anywhere in the game. A facilitator reaches it by adding
+   #facilitator to the end of the game URL, then entering this
+   passphrase once per device.
+   Note: anyone who opens "View source" can read this value, so
+   treat it as a deterrent against curious players, not a secret.
+================================================================ */
+const FACILITATOR_KEY = 'ideal';
+const FACIL_FLAG = 'energyDuels.facil.v1';
 
 const LS_KEY='energyDuels.v1', ROOM_KEY='energyDuels.room.v1';
 const WS_KEY='energyDuels.workshop.v1', CID_KEY='energyDuels.client.v1';
@@ -1708,12 +1734,46 @@ $('#wsCode').addEventListener('input',e=>{
 });
 $('#btnRetrySend').addEventListener('click',submitToRoom);
 
-/* ---------- facilitator: room view ---------- */
-$('#linkRoom').addEventListener('click',()=>{
+/* ---------- facilitator: room view (hidden from players) ----------
+   No link to this exists in the game. A facilitator opens it by adding
+   #facilitator to the URL and entering FACILITATOR_KEY once per device. */
+function facilUnlocked(){ try{ return localStorage.getItem(FACIL_FLAG)==='1'; }catch(e){ return false; } }
+function normKey(s){ return (s||'').trim().toLowerCase(); }
+
+function openRoomView(){
   show('#scr-room');
   if(!cloudOn()) setRoomMode('paste');
-});
-$('#btnRoomBack').addEventListener('click',()=>{ stopRoomWatch(); show('#scr-welcome'); });
+}
+function requestRoomView(){
+  if(facilUnlocked()){ openRoomView(); return; }
+  $('#gateKey').value='';
+  $('#gateState').className='ws-state';
+  $('#gateState').textContent='';
+  show('#scr-gate');
+  setTimeout(()=>$('#gateKey').focus(),120);
+}
+function tryUnlock(){
+  if(normKey($('#gateKey').value)===normKey(FACILITATOR_KEY)){
+    try{ localStorage.setItem(FACIL_FLAG,'1'); }catch(e){}
+    toast('Room view unlocked 🔓');
+    openRoomView();
+  }else{
+    $('#gateState').className='ws-state bad';
+    $('#gateState').textContent='That passphrase is not right.';
+    $('#gateKey').value=''; $('#gateKey').focus();
+  }
+}
+$('#btnGateOpen').addEventListener('click',tryUnlock);
+$('#gateKey').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); tryUnlock(); } });
+$('#btnGateBack').addEventListener('click',()=>{ clearFacilHash(); show('#scr-welcome'); });
+
+function clearFacilHash(){
+  if(location.hash) history.replaceState(null,'',location.pathname+location.search);
+}
+function isFacilHash(){ return /^#(facilitator|room)$/i.test(location.hash||''); }
+window.addEventListener('hashchange',()=>{ if(isFacilHash()) requestRoomView(); });
+
+$('#btnRoomBack').addEventListener('click',()=>{ stopRoomWatch(); clearFacilHash(); show('#scr-welcome'); });
 
 function setRoomMode(m){
   const ws=m==='workshop';
@@ -1794,6 +1854,9 @@ $('#btnRoomLocal').addEventListener('click',()=>{
       toast('Previous game discarded');
     });
   }
+
+  /* #facilitator is the only way into the room view */
+  if(isFacilHash()) requestRoomView();
 })();
 window.addEventListener('resize',()=>{ const cv=$('#confetti'); cv.width=innerWidth; cv.height=innerHeight; });
 </script>

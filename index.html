@@ -311,7 +311,6 @@
 
     <button class="btn" id="btnStart" disabled>Start&ensp;→</button>
 
-    <p class="room-link">Facilitating a workshop? <a id="linkRoom">Open the room view</a></p>
     <p class="disclaimer">Your responses are saved only on this device. Sharing your result with the room is optional and anonymous. No result is better than another — the aim is range, not type.</p>
   </section>
 
@@ -410,6 +409,24 @@
         <div class="share-code" onclick="copyCode()" title="Click to copy"><span id="codeText"></span><span class="cp">Copy</span></div>
         <p class="note" style="margin-top:10px">The code carries your four scores only — no name, no answers.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- ============ FACILITATOR GATE ============ -->
+  <section id="scr-gate" class="screen">
+    <div class="kicker">🔒 Facilitator access</div>
+    <h1 class="display" style="font-size:clamp(28px,5vw,40px)">Room view is <em>locked</em></h1>
+    <p class="lede">This area shows the anonymous group aggregate for a workshop. Enter the facilitator passphrase to continue.</p>
+    <div style="margin:26px 0 18px">
+      <label for="gateKey" class="note" style="display:block;letter-spacing:.24em;text-transform:uppercase;margin-bottom:10px;font-weight:600">Passphrase</label>
+      <input id="gateKey" type="password" maxlength="40" autocomplete="off" spellcheck="false" placeholder="••••••"
+             style="width:100%;max-width:340px;background:var(--bg2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font-family:var(--sans);font-size:17px;letter-spacing:.1em;padding:13px 18px;outline:none"
+             onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--line2)'">
+    </div>
+    <p id="gateState" class="note" style="color:var(--war);min-height:18px;margin-bottom:18px"></p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn" id="btnGateOpen">Unlock room view</button>
+      <button class="btn ghost" id="btnGateBack">← Back to start</button>
     </div>
   </section>
 
@@ -611,6 +628,19 @@ function load(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)); }catch(e)
 function clearSaved(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} }
 
 const ROOM_KEY = 'energyGame.room.v1';
+
+/* ================================================================
+   FACILITATOR ACCESS  —  ⚙ CHANGE THIS PASSPHRASE
+   ----------------------------------------------------------------
+   The room view is hidden from participants: there is no link to it
+   anywhere in the app. A facilitator reaches it by adding
+   #facilitator to the end of the URL, then entering this passphrase
+   once per device.
+   Note: anyone who opens "View source" can read this value, so treat
+   it as a deterrent against curious participants, not a secret.
+================================================================ */
+const FACILITATOR_KEY = 'ideal';
+const FACIL_FLAG = 'energyGame.facil.v1';
 function saveRoomResult(scores){
   try{
     const db = JSON.parse(localStorage.getItem(ROOM_KEY)||'[]');
@@ -1174,8 +1204,38 @@ $('#btnRestart').addEventListener('click', ()=>{
   show('#scr-welcome');
 });
 
-$('#linkRoom').addEventListener('click', ()=>show('#scr-room'));
-$('#btnRoomBack').addEventListener('click', ()=>show('#scr-welcome'));
+/* ---------- facilitator: room view (hidden from participants) ----------
+   No link to this exists in the app. A facilitator opens it by adding
+   #facilitator to the URL and entering FACILITATOR_KEY once per device. */
+function facilUnlocked(){ try{ return localStorage.getItem(FACIL_FLAG)==='1'; }catch(e){ return false; } }
+function normKey(s){ return (s||'').trim().toLowerCase(); }
+function clearFacilHash(){
+  if(location.hash) history.replaceState(null,'',location.pathname+location.search);
+}
+function isFacilHash(){ return /^#(facilitator|room)$/i.test(location.hash||''); }
+
+function requestRoomView(){
+  if(facilUnlocked()){ show('#scr-room'); return; }
+  $('#gateKey').value=''; $('#gateState').textContent='';
+  show('#scr-gate');
+  setTimeout(()=>$('#gateKey').focus(),120);
+}
+function tryUnlock(){
+  if(normKey($('#gateKey').value)===normKey(FACILITATOR_KEY)){
+    try{ localStorage.setItem(FACIL_FLAG,'1'); }catch(e){}
+    toast('Room view unlocked 🔓');
+    show('#scr-room');
+  }else{
+    $('#gateState').textContent='That passphrase is not right.';
+    $('#gateKey').value=''; $('#gateKey').focus();
+  }
+}
+$('#btnGateOpen').addEventListener('click', tryUnlock);
+$('#gateKey').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryUnlock(); } });
+$('#btnGateBack').addEventListener('click', ()=>{ clearFacilHash(); show('#scr-welcome'); });
+window.addEventListener('hashchange', ()=>{ if(isFacilHash()) requestRoomView(); });
+
+$('#btnRoomBack').addEventListener('click', ()=>{ clearFacilHash(); show('#scr-welcome'); });
 $('#btnRoomBuild').addEventListener('click', ()=>buildRoom(parseRoomCodes($('#codesInput').value)));
 $('#btnRoomLocal').addEventListener('click', ()=>{
   let local=[];
@@ -1203,6 +1263,9 @@ $('#btnRoomLocal').addEventListener('click', ()=>{
       toast('Previous session discarded');
     });
   }
+
+  /* #facilitator is the only way into the room view */
+  if(isFacilHash()) requestRoomView();
 })();
 </script>
 </body>
