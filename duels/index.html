@@ -250,6 +250,30 @@
   }
   .debrief .dq{font-family:var(--disp);font-weight:800;font-size:17px;color:var(--ink);line-height:1.45}
 
+  /* range-challenge teaching blocks */
+  .range-result .card{margin-bottom:14px}
+  .range-result p{color:var(--ink-dim);font-size:14.5px;line-height:1.65;font-weight:600}
+  .ava-sm{width:38px;height:38px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(67,51,31,.25);flex:none}
+  .fx-hd{display:flex;align-items:center;gap:12px;font-family:var(--disp);font-weight:800;font-size:19px;margin-bottom:10px}
+  .fx-hd.sm{font-size:16px;margin-bottom:8px}
+  .fx-hd.sm .ava-sm{width:32px;height:32px}
+  .fx-lbl{font-family:var(--disp);font-size:12px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;margin:12px 0 3px}
+  .fx-lbl.good{color:#3f8f6d}
+  .fx-lbl.bad{color:var(--war)}
+  .fx-heading{font-family:var(--disp);font-weight:800;font-size:18px;margin:20px 0 10px;color:var(--ink)}
+  .fx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+  .fx{background:var(--card2);border:2px solid var(--line);border-top-width:7px;border-radius:16px;padding:16px 16px 18px}
+  .fx p{font-size:13.5px;line-height:1.55}
+  .fx .fx-lbl{font-size:11px;margin:10px 0 2px}
+  .read-card{background:linear-gradient(180deg,#fffdf7,var(--sov-soft));border-color:var(--gold-soft)!important;border-left:10px solid var(--gold)!important}
+  .read-tag{font-family:var(--disp);font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:8px}
+  .read-seq{font-family:var(--disp);font-weight:800;font-size:20px;color:var(--ink)!important;margin-bottom:8px}
+  .read-caveat{margin-top:12px;padding-top:12px;border-top:2px dashed var(--line2);font-size:13.5px!important}
+  .mirror{border-left:10px solid var(--jes)!important}
+  .mirror.default{border-left-color:var(--sov)!important;background:linear-gradient(180deg,#fffdf7,var(--sov-soft))}
+  .mirror.stretch{border-left-color:var(--jes)!important;background:linear-gradient(180deg,#fffdf9,var(--jes-soft))}
+  .mirror em{color:var(--ink);font-style:normal;font-weight:800}
+
   /* ---------- commit / done ---------- */
   .energy-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:18px 0}
   .epick{
@@ -495,7 +519,7 @@
   <section id="scr-range" class="screen">
     <span class="kicker">🎯 Range Challenge — not scored</span>
     <h2 class="screen-title">What does <em>this</em> situation need?</h2>
-    <p class="lede" style="font-size:15px">Now that you've met all four energies, flip the question: choose the energy the situation most needs — <b>not the one that feels most natural</b>.</p>
+    <p class="lede" style="font-size:15px">Now that you've met all four energies, flip the question: choose the energy the situation most needs — <b>not the one that feels most natural</b>. Commit to an opening move and you'll see what every option creates, what each one costs, and how a practitioner would sequence them.</p>
     <div class="situation" style="margin-top:18px">
       <div class="st">The situation</div>
       <div class="sp" id="rangeSit"></div>
@@ -739,33 +763,99 @@ const PRESSURE = [
   {id:'P_SKIP',key:'NONE',text:'Prefer not to answer.',label:'No pressure tendency selected'}
 ];
 
+/* Application mode. Unscored by design — the learning is in comparing what each
+   move creates and costs, and in the sequence, not in picking a "right" card.
+   Per spec sheet 3 step 7: show the distinctive value AND risk of every move. */
 const RANGE_SCENARIOS = [
   {sit:'A cross-divisional transformation is losing momentum and teams disagree about priorities.',
    moves:{SOV:'Re-establish the shared outcome, decision rights and trade-offs across the system.',
           WAR:'Identify the critical blockers, owners and next commitments needed to regain momentum.',
           LOV:'Surface how the change is landing and involve teams in resolving legitimate concerns.',
           JES:'Run a focused experiment that tests a simpler route and creates fresh evidence.'},
+   fx:{
+     SOV:{creates:'One definition of success and clarity on who decides what — usually the thing that quietly went missing when each division started optimising for its own priorities.',
+          risks:'If the disagreement is really about mistrust or unspoken loss, more clarity lands as more instruction. You can restate the purpose perfectly and still move no one.',
+          ideal:'Think Ecosystem · Lead with Foresight'},
+     WAR:{creates:'Visible motion. Blockers acquire names, owners and dates, and drift converts into commitments the whole system can see.',
+          risks:'Driving delivery through a live disagreement about priorities hard-codes one division’s view. You buy compliance now and a slower stall later.',
+          ideal:'Act with Courage · Pursue Excellence'},
+     LOV:{creates:'Access to the real reason momentum died — which is usually something nobody has said out loud in the steering meeting.',
+          risks:'Listening that never converges becomes its own delay. The drift continues, with better feelings about it.',
+          ideal:'Foster Inclusion & EI · Collaborate Effectively'},
+     JES:{creates:'Evidence instead of opinion. One small, fast test can settle an argument that three more meetings will not.',
+          risks:'An experiment launched into unresolved priority conflict simply becomes a fifth competing priority.',
+          ideal:'Drive Experimentation & Improvement · Embrace Learning Agility'}},
+   read:{first:'SOV', then:'LOV',
+     why:'When momentum dies across divisions, the missing ingredient is rarely effort — it is a shared definition of done and clarity on who decides. King / Queen restores that frame. But the frame alone tends to produce a decision the room nods at and then quietly ignores, so pair it immediately with Lover to find out how it is actually landing and what each division believes it is losing. Warrior becomes powerful once priorities are genuinely agreed; before that it drives the wrong thing efficiently. Jester earns its place when the disagreement is factual rather than relational.'},
    ideal:'Aim High · Empathise · Dare to Try · Think Ecosystem',
    debrief:'Which energy is missing — not which one sounds generally best?'},
+
   {sit:'A talented officer is underperforming after moving into a more demanding role.',
    moves:{SOV:'Clarify the role contract, expected standard and fair path forward.',
           WAR:'Name the gap directly and agree concrete actions and milestones.',
           LOV:'Understand the officer’s experience, confidence and support needs.',
           JES:'Explore a different challenge, role design or method that could unlock contribution.'},
+   fx:{
+     SOV:{creates:'Removes ambiguity about what the role now demands. A surprising number of step-up failures are role-definition failures rather than capability ones.',
+          risks:'If they already know they are struggling, restating the standard adds weight to a load that is already too heavy.',
+          ideal:'Grow Teams · Pursue Excellence'},
+     WAR:{creates:'Honesty and a timeline. Avoiding the gap to be kind is not kindness — it quietly removes their chance to recover.',
+          risks:'Milestones applied to a confidence problem accelerate the decline. You may be generating evidence of effort rather than addressing the cause.',
+          ideal:'Act with Courage · Lead Self'},
+     LOV:{creates:'The diagnosis. Step-up underperformance is usually confidence, unclear expectations or missing support — and you cannot tell which from the outside.',
+          risks:'Understanding that never converts into expectation leaves them in a comfortable decline. Care without a standard is abandonment in a warm voice.',
+          ideal:'Show Genuine Care · Cultivate Growth'},
+     JES:{creates:'Questions the assumption that the role as designed is the only shape the job can take. Sometimes the role, not the officer, is the misfit.',
+          risks:'Redesigning around one person’s discomfort can move the problem rather than solve it, and reads as rescue to everyone watching.',
+          ideal:'Embrace Learning Agility · Drive Innovation & Transformation'}},
+   read:{first:'LOV', then:'SOV',
+     why:'This is the scenario where instinct and need most often diverge. You are looking at one symptom with at least three different causes — confidence, clarity, capability — and the right move differs completely depending on which it is. Lover first is diagnosis, not softness: it tells you what you are actually dealing with. King / Queen then names the standard and the path, so that support has a shape and the team sees fairness. Warrior’s candour is essential, but it lands far better second, when you are being candid about something you understand. Jester matters if the diagnosis points at the design of the role rather than the person in it.'},
    ideal:'Grow Teams · Show Genuine Care · Pursue Excellence · Cultivate Growth',
    debrief:'What sequence of two energies would be most useful?'},
+
   {sit:'A team has generated many ideas but very little has reached implementation.',
    moves:{SOV:'Select the ideas that best serve the mission and create a coherent portfolio.',
           WAR:'Choose one priority, define done and drive it through to completion.',
           LOV:'Understand what is reducing ownership or confidence in carrying ideas forward.',
           JES:'Reframe the experiments to produce faster learning and clearer evidence.'},
+   fx:{
+     SOV:{creates:'A principled basis for saying no. Teams that generate endlessly are often teams that have been protected from having to choose.',
+          risks:'Portfolio curation can become one more planning artefact — a beautifully rationalised list, and still nothing shipped.',
+          ideal:'Aim High · Think Ecosystem'},
+     WAR:{creates:'The missing muscle. The gap here is completion, and this is the energy that closes things.',
+          risks:'Force-completing the wrong idea burns credibility. Choosing without principles simply hands the win to the loudest voice.',
+          ideal:'Pursue Excellence · Act with Courage'},
+     LOV:{creates:'Insight into why nobody picks things up — often earlier ideas were killed without explanation, so ownership now feels unsafe.',
+          risks:'Exploring why people will not commit can itself become the avoidance, especially in a team that enjoys the conversation.',
+          ideal:'Grow Teams · Foster Inclusion & EI'},
+     JES:{creates:'More learning per unit of effort, and sharper evidence about which ideas deserve to survive.',
+          risks:'This is already the team’s default. More reframing feeds the very pattern that is causing the problem.',
+          ideal:'Drive Experimentation & Improvement'}},
+   read:{first:'WAR', then:'SOV',
+     why:'Notice the trap in this one: Jester feels generative and entirely on-brand for an ideas-rich team, which is precisely why more of it deepens the problem. The blockage is completion, so Warrior is what the moment asks for — pick one thing, define what done means, finish it. King / Queen follows closely so that what gets finished is what matters rather than what was easiest to close. Lover becomes the priority if you discover the real blocker is that ownership feels unsafe; no amount of driving will fix that.'},
    ideal:'Drive Experimentation & Improvement · Pursue Excellence · Grow Teams',
    debrief:'Which energy is overused — and which must now be activated?'},
+
   {sit:'An operational incident has been contained, but trust between teams has been damaged.',
    moves:{SOV:'Clarify shared responsibilities and establish the principles for future coordination.',
           WAR:'Address the missed commitments and put corrective actions in place.',
           LOV:'Create space to understand the impact, repair relationships and restore trust.',
           JES:'Use the incident to challenge old assumptions and redesign how teams work together.'},
+   fx:{
+     SOV:{creates:'Structural prevention. Ambiguity about who holds what is often exactly what let the incident happen in the first place.',
+          risks:'Moving to protocol before repair reads as avoidance. New coordination rules land on a relationship that cannot yet carry them.',
+          ideal:'Think Ecosystem · Lead with Foresight'},
+     WAR:{creates:'Accountability, without which repair is only sentiment. Naming what was not done protects the standard for everyone.',
+          risks:'Accountability before acknowledgment is heard as blame, and hardens the exact positions you need to soften.',
+          ideal:'Act with Courage · Build Resilience'},
+     LOV:{creates:'The precondition for everything else. The operational problem is closed; the human one has barely opened.',
+          risks:'Repair with no accountability and no structural change feels good and prevents nothing. The teams re-collide in six months.',
+          ideal:'Show Genuine Care · Collaborate Effectively'},
+     JES:{creates:'Turns an expensive event into system learning while the evidence is still vivid and nobody can pretend it did not happen.',
+          risks:'Reframing too early can feel like skipping past real harm to get to the interesting part.',
+          ideal:'Learn & Relearn · Drive Experimentation & Improvement'}},
+   read:{first:'LOV', then:'SOV',
+     why:'“Contained” is the key word: the technical work is finished and the relational work has not started. Lover goes first because every other move needs a relationship strong enough to carry it — corrective actions land as blame and new protocols land as bureaucracy until people feel the impact has been heard. What follows depends on what repair surfaces: King / Queen if the failure was structural and ownership was genuinely unclear, Warrior if commitments were simply missed. Jester comes last, once there is enough trust for the teams to examine their assumptions together instead of defending.'},
    ideal:'Build Resilience · Collaborate Effectively · Think Ecosystem',
    debrief:'What does the immediate moment need — and what should follow next?'}
 ];
@@ -989,7 +1079,7 @@ function renderTiebreak(pair){
   const tb=TIEBREAKS[pair];
   $('#duelTag').textContent='SUDDEN DEATH';
   $('#duelSit').textContent=tb.sit;
-  $('#btnDuelNext').textContent='Reveal my energy ✨';
+  $('#btnDuelNext').textContent='One last reflection →';
   $('#pips').innerHTML='';
   if(!state.tb || state.tb.pair!==pair) state.tb={pair, winner:null, flip:Math.random()<.5};
   const flip=state.tb.flip;
@@ -1247,17 +1337,72 @@ function renderRange(){
 }
 function showRangeResult(k){
   const sc=RANGE_SCENARIOS[rangeIdx];
-  const e=ENERGIES[k];
+  const e=ENERGIES[k], fx=sc.fx[k];
+  const rd=sc.read, first=ENERGIES[rd.first], then=ENERGIES[rd.then];
+  const prof = result || classify(computeWins(), state.tb);
+
+  /* how this pick sits against their own duel profile */
+  let mirror='', mtone='neutral';
+  const isLead = prof.mode!=='balanced' && prof.top.includes(k);
+  const isStretch = prof.mode!=='balanced' && prof.bottom.includes(k);
+  if(isLead){
+    mtone='default';
+    mirror=`This is also the energy you reached for most in the duels. That is worth pausing on: is it what <em>this</em> situation needs, or is it simply the move you make everywhere? Your default is a genuine strength — it becomes a limitation only when it arrives automatically.`;
+  } else if(isStretch){
+    mtone='stretch';
+    mirror=`You chose the energy you reached for <em>least</em> in the duels. That is range in action — deliberately reading the situation rather than running your instinct. Notice what it took to get there; that is the muscle worth practising.`;
+  } else {
+    mirror=`This energy sits in the middle of your profile — available to you, but not automatic. These middle energies are usually the easiest range to grow, because you already know how to use them.`;
+  }
+  if(prof.mode!=='balanced' && prof.bottom.includes(rd.first)){
+    mirror += ` Worth noting: the read below leads with ${first.name}, your least-accessed energy in this item set.`;
+  }
+
+  const agrees = k===rd.first;
+
   $('#rangeResult').innerHTML=`
-    <div class="card" style="border-left:10px solid ${e.color}">
-      <p style="font-weight:800;font-size:16px;margin-bottom:6px">You chose the <span style="color:${e.color}">${e.name}</span> move — a defensible call!</p>
-      <p style="color:var(--ink-dim);font-size:14px;line-height:1.65;font-weight:600">There's no single right answer here: each move creates something different. The skill is matching the energy to the moment — and noticing when you default to your natural one instead.</p>
-      <p class="note" style="margin-top:10px">IDEAL lens: ${sc.ideal}</p>
+    <div class="card fx-mine" style="border-left:10px solid ${e.color}">
+      <div class="fx-hd"><img class="ava-sm" src="${IMGS.ava[k]}" alt=""><span style="color:${e.color}">You led with the ${e.name} move</span></div>
+      <h6 class="fx-lbl good">✓ What it creates here</h6>
+      <p>${fx.creates}</p>
+      <h6 class="fx-lbl bad">⚠ What it risks here</h6>
+      <p>${fx.risks}</p>
+      <p class="note" style="margin-top:12px">IDEAL behaviours: ${fx.ideal}</p>
     </div>
+
+    <h3 class="fx-heading">What the other three would create — and cost</h3>
+    <div class="fx-grid">
+      ${EKEYS.filter(x=>x!==k).map(x=>{
+        const oe=ENERGIES[x], of=sc.fx[x];
+        return `<div class="fx" style="border-top-color:${oe.color}">
+          <div class="fx-hd sm"><img class="ava-sm" src="${IMGS.ava[x]}" alt=""><span style="color:${oe.color}">${oe.name}</span></div>
+          <h6 class="fx-lbl good">✓ Creates</h6><p>${of.creates}</p>
+          <h6 class="fx-lbl bad">⚠ Risks</h6><p>${of.risks}</p>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="card read-card">
+      <div class="read-tag">🧭 A consultant's read</div>
+      <p class="read-seq">Lead with <b style="color:${first.color}">${first.name}</b>, then <b style="color:${then.color}">${then.name}</b>.</p>
+      <p>${rd.why}</p>
+      <p class="note" style="margin-top:12px">IDEAL lens for this situation: ${sc.ideal}</p>
+      <p class="read-caveat">${agrees
+        ? `Your move matches this read — so push further: what would have to be true for a <b>different</b> energy to be the better opening?`
+        : `You opened differently. That is legitimate — practitioners disagree, and context you can imagine changes the answer. The useful question is what you would need to know about this situation for your move to be the stronger one.`}</p>
+    </div>
+
+    <div class="card mirror ${mtone}">
+      <div class="read-tag">🪞 Against your own profile</div>
+      <p>${mirror}</p>
+    </div>
+
     <div class="debrief"><div class="dq">💭 ${sc.debrief}</div></div>`;
+
   $('#rangeResult').classList.add('show');
   $('#btnRangeAnother').style.display = state.rangePlayed.length<4 ? 'inline-flex':'none';
   $('#btnRangeNext').style.display='inline-flex';
+  $('#btnRangeAnother').textContent = `🎲 Another situation (${state.rangePlayed.length} of 4 played)`;
 }
 
 /* ================================================================
@@ -1671,7 +1816,9 @@ $('#btnPracBack').addEventListener('click',()=>show('#scr-welcome'));
 $('#btnPracNext').addEventListener('click',()=>{ duelIdx=0; renderDuel(); show('#scr-duel'); });
 
 $('#btnDuelNext').addEventListener('click',()=>{
-  if(inTiebreak){ beginReveal(); return; }
+  /* after the tie-break the pressure reflection still has to run — it is a
+     separate, unscored step and was previously skipped for tied players */
+  if(inTiebreak){ renderPressure(); show('#scr-pressure'); return; }
   state.lastDone=Math.max(state.lastDone,duelIdx); save();
   if(duelIdx===11){ afterDuels(); return; }
   duelIdx++; renderDuel();
